@@ -104,14 +104,16 @@
     (concat
      (truncate-string-to-width .name consult-spotify-emms-max-name-length nil nil 'ellipsis)
      #(" " 0 1 (display (space :align-to 40)))
-     
+
      (cl-case (string-to-char .type)
        (?t
         (concat
          " from " (propertize (alist-get 'name .album) 'face 'consult-spotify-emms-album)
          " by " (alist-get 'name (car .artists))))
 
-       (?a (concat " by " (alist-get 'name (car .artists))))
+       (?a (concat " by " (alist-get 'name (car .artists))
+                   (propertize (concat " [" .release_date "]") 'face 'shadow)))
+
        (?p (concat " by " (alist-get 'display_name .owner)))))))
 
 (defun consult-spotify-emms--search (input &optional type)
@@ -127,7 +129,7 @@
     (mapcar (lambda (item)
               (let ((type (string-to-char (alist-get 'type item))))
                 (propertize (consult--tofu-append (consult-spotify-emms--format item) type)
-                            'consult--type type 
+                            'consult--type type
                             'consult--candidate item))))))
 
 (defconst consult-spotify-emms--narrow
@@ -159,7 +161,7 @@
     :group (consult--type-group consult-spotify-emms--narrow)
     :narrow (consult--type-narrow consult-spotify-emms--narrow))))
 
-;;;; EMMS functions 
+;;;; EMMS functions
 (defun consult-spotify-emms--make-track (item)
   "Make emms-track out of spotify's json ITEM."
   (let-alist item
